@@ -1,11 +1,23 @@
 
 class SimulatedAnnealing:
-    def __init__(self, calib_trials):
+    def __init__(self, calib_trials, dofs, vTendon):
         self.calib_trials = calib_trials
+        self.dofs = dofs
+        self.vTendon = vTendon
 
-    @staticmethod
+        Wu_Muscles = ["LVS", "SBCL",
+                      "TRP1", "TRP2", "TRP3", "TRP4",
+                      "RMN", "RMJ1", "RMJ2",
+                      "SRA1", "SRA2", "SRA3", "PMN",
+                      "DELT1", "DELT2", "DELT3",
+                      "SUPSP", "INFSP", "SUBSC", "TMIN",
+                      "TMAJ", "PECM1", "PECM2", "PECM3", "LAT", "CORB"]
+
+
+
+@staticmethod
     def name():
-        return "SimulatedAnneling"
+        return "Wu_GH_v1"
 
     def calib(self):
         return {
@@ -22,12 +34,12 @@ class SimulatedAnnealing:
             },
             "NMSmodel": {
                 "type": {"openLoop": None},
-                "tendon": {"stiff": None},
+                "tendon": {self.vTendon: None},
                 "activation": {"exponential": None}
             },
             "calibrationSteps": {
                 "step": {
-                    "dofs": ("shoulder_plane", "shoulder_ele", "shoulder_rotation"),
+                    "dofs": self.dofs, #("shoulder_plane", "shoulder_ele", "shoulder_rotation"),
                     "objectiveFunction": {"minimizeTorqueError": None},
                     "parameterSet": {
                         "parameter": (
@@ -39,8 +51,8 @@ class SimulatedAnnealing:
                                               "muscles__RM_BEGIN__2__RM_END__": ("PECM1", "PECM2", "PECM3"),
                                               "muscles__RM_BEGIN__3__RM_END__": ("LAT", "")},
                              "absolute": {"range": (-2.999, -0.001)}},
-                            {"name": "tendonSlackLength", "single": None, "relativeToSubjectValue": {"range": (0.9, 1.1)}},
-                            {"name": "optimalFibreLength", "single": None, "relativeToSubjectValue": {"range": (0.9, 1.1)}},
+                            {"name": "tendonSlackLength",   "single": None, "relativeToSubjectValue": {"range": (0.9, 1.1)}},
+                            {"name": "optimalFibreLength",  "single": None, "relativeToSubjectValue": {"range": (0.9, 1.1)}},
                             {"name": "strengthCoefficient", "single": None, "absolute": {"range": (0.3, 6)}},
                         ),
                     }

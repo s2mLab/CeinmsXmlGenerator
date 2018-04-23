@@ -1,8 +1,8 @@
 
-class Stiff:
+class EMG_driven_Stiff:
     @staticmethod
     def name():
-        return "Stiff"
+        return "EMG_driven_Stiff"
 
     @staticmethod
     def dict():
@@ -17,10 +17,10 @@ class Stiff:
         }
 
 
-class Elastic:
+class EMG_driven_Elastic:
     @staticmethod
     def name():
-        return "Elastic"
+        return "EMG_driven_Elastic"
 
     @staticmethod
     def dict():
@@ -35,10 +35,10 @@ class Elastic:
         }
 
 
-class Hybrid:
+class Hybrid_Sitff:
     @staticmethod
     def name():
-        return "Elastic"
+        return "Hybrid_Sitff"
 
     @staticmethod
     def dict():
