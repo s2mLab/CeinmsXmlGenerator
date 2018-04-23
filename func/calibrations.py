@@ -61,3 +61,4 @@ class SimulatedAnnealing:
             "trialSet": self.calib_trials
         }
 
+
