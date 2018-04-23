@@ -1,5 +1,5 @@
 import os, glob
-from func import calibrations, excitations, execution, models
+from func import calibrations, excitations, execution, LoadModel
 from func.CeinmWriter import CeinmWriter, SetupCalib, SetupTrial
 
 if os.environ['COMPUTERNAME'] =='DESKTOP-4KTED5M':
@@ -22,7 +22,7 @@ vTendon = 'stiff' #| 'elastic'
 
 
 SubjectPath = "../%s/Trials" % (Subject)
-LoadModel(ModelName)
+Model = LoadModel(ModelName)
 
 if Model["ModelName"].lower() == 'wu' or Model["ModelName"].lower() == 'das3':
     if DoF.lower() == 'g': DoFName = Model["DoFName"][-3:]
