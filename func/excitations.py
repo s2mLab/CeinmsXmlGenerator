@@ -2,7 +2,7 @@
 class Wu_v1:
     @staticmethod
     def name():
-        return "EMG"
+        return "Wu_v1"
 
     @staticmethod
     def excitation():
@@ -33,7 +33,7 @@ class Wu_v1:
 class Wu_v3:
     @staticmethod
     def name():
-        return "EMG"
+        return "Wu_v3"
 
     @staticmethod
     def excitation():
