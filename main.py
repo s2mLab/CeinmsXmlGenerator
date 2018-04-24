@@ -1,5 +1,6 @@
 import os, glob
-from func import calibrations, excitations, execution, LoadModel
+from func import calibrations, excitations, execution
+from func.LoadModel import LoadModel
 from func.CeinmWriter import CeinmWriter, SetupCalib, SetupTrial
 
 if os.environ['COMPUTERNAME'] =='DESKTOP-4KTED5M':
@@ -15,11 +16,9 @@ DoF = 'G' # 'G' | 'SAG"
 ModelName = 'Wu' # "Wu"| 'DAS3'
 Subject = 'DapO'
 vCalibTrials = 1
-Trials = 'AllButCalib' # | 'All' | 'AllButCalib' | 'Calib'
+Trials = 'All' # | 'All' | 'AllButCalib' | 'Calib'
 vTendon = 'stiff' #| 'elastic'
 # # # END OF THE MAIN VARIABLES # # #
-
-
 
 SubjectPath = "../%s/Trials" % (Subject)
 Model = LoadModel(ModelName)
@@ -31,9 +30,12 @@ elif DoF.lower() =='sag':  DoFName = Model["DoFName"][0:2] + Model["DoFName"][3:
 print("DoF for CEINMS are: "); print(DoFName)
 
 # # # GENERATE trials.xml # # #
-for subdir in  next(os.walk(SubjectPath))[1]: #regarder tous les dossiers et générer les xml
-    print("Generate xml for trial: " + subdir)
-    Generate_trial_xml(Model, subdir)
+for subdir in next(os.walk(os.path.join(base_path, SubjectPath)))[1]: #regarder tous les dossiers et générer les xml
+    fname = os.path.join(base_path, SubjectPath, subdir+'.xlm')
+    if not os.path.isfile(fname):
+        print("Generate xml for trial: " + subdir)
+        Generate_trial_xml(Model, subdir) #TODO by Mickael
+
 
 
 # # # CHOOSE CalibTrials and Trials # # #
@@ -43,15 +45,15 @@ if vCalibTrials == 1:
     x=[6, 12, 18] #kg
     y=1 #changer pour excentric yeux -> hanches qd tout généré par Romain
     z=1 #x= all,
-    for i in x: calib_trials = calib_trials + glob.glob("%s/*%d*%d_%d.xml" %(SubjectPath,i,y,z))
+    for i in x: calib_trials = calib_trials + glob.glob("%s/*%d*%d_%d.xml" %(os.path.join(base_path, SubjectPath), i, y, z))
 else:
     print("%d: HAS TO BE DONE" %(vCalibTrials))
 
 
 if Trials.lower() == 'all':
-    trials = glob.glob("%s/*.xml" %(SubjectPath))
+    trials = glob.glob("%s/*.xml" %(os.path.join(base_path, SubjectPath)))
 elif Trials.lower() == 'allbutcalib':
-    trials = glob.glob("%s/*.xml" %(SubjectPath))
+    trials = glob.glob("%s/*.xml" %(os.path.join(base_path, SubjectPath)))
     for i in calib_trials: trials.remove(i)
 elif Trials.lower() == 'calib':
     trials = calib_trials
@@ -64,9 +66,9 @@ print(trials) #trials = ("../../Trials/F6H1_1.xml", "../../Trials/F6H1_1.xml")
 
 # # # CALIB # # #
 setup_calib = SetupCalib()
-setup_calib.uncalibrated_model = GenerateSubject(dofs)
-setup_calib.excitation = excitations.Wu_v3(dofs, vTendon)
-setup_calib.calibration = calibrations.Wu_GH_v1(calib_trials, dofs, vTendon, Model)
+setup_calib.uncalibrated_model = GenerateSubject(DoFName) # TODO by Benjamin
+setup_calib.excitation = excitations.Wu_v3()
+setup_calib.calibration = calibrations.Wu_GH_v1(calib_trials, DoFName, vTendon, Model)
 setup_calib.force_calibration = True
 #################
 
