@@ -72,7 +72,7 @@ setup_calib = SetupCalib()
 setup_calib.uncalibrated_model = models.Wu()   #  GenerateSubject(DoFName)  # TODO by Benjamin
 setup_calib.excitation = excitations.Wu_v3()
 setup_calib.calibration = calibrations.Wu_GH_v1(calib_trials, DoFName, vTendon, Model)
-setup_calib.force_calibration = False
+setup_calib.force_calibration = True
 #################
 
 # # # TRIALS # # #
