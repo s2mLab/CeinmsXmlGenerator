@@ -39,7 +39,7 @@ class Wu_GH_v1:
                              "muscleGroups": {"muscles__RM_BEGIN__0__RM_END__": self.groups["g5"],# ("DELT1", "DELT2", "DELT3"),
                                               "muscles__RM_BEGIN__1__RM_END__": self.groups["g6"],# ("SUPSP", "INFSP", "SUBSC", "TMIN"),
                                               "muscles__RM_BEGIN__2__RM_END__": self.groups["g7"],# ("PECM1", "PECM2", "PECM3"),
-                                              "muscles__RM_BEGIN__3__RM_END__": ("LAT","")},  # ("LAT", "")},
+                                              "muscles__RM_BEGIN__3__RM_END__": ("LAT", "")},  # ("LAT", "")},
                                               "absolute": {"range": (-2.999, -0.001)}},
                             {"name": "tendonSlackLength", "single": None, "relativeToSubjectValue": {"range": (0.9, 1.1)}},
                             {"name": "optimalFibreLength", "single": None, "relativeToSubjectValue": {"range": (0.9, 1.1)}},

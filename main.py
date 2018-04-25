@@ -1,6 +1,7 @@
 import os, glob
-from func import calibrations, excitations, execution
+from func import calibrations, excitations, execution, models
 from func.LoadModel import LoadModel
+from func.Generate_trial_xml import generate_trial_xml
 from func.CeinmWriter import CeinmWriter, SetupCalib, SetupTrial
 
 if os.environ['COMPUTERNAME'] =='DESKTOP-4KTED5M':
@@ -31,10 +32,10 @@ print("DoF for CEINMS are: "); print(DoFName)
 
 # # # GENERATE trials.xml # # #
 for subdir in next(os.walk(os.path.join(base_path, SubjectPath)))[1]: #regarder tous les dossiers et générer les xml
-    fname = os.path.join(base_path, SubjectPath, subdir+'.xlm')
+    fname = os.path.join(base_path, SubjectPath, subdir+'.xml')
     if not os.path.isfile(fname):
         print("Generate xml for trial: " + subdir)
-        Generate_trial_xml(Model, subdir) #TODO by Mickael
+        generate_trial_xml(Model, subdir, fname)
 
 
 
@@ -66,7 +67,7 @@ print(trials) #trials = ("../../Trials/F6H1_1.xml", "../../Trials/F6H1_1.xml")
 
 # # # CALIB # # #
 setup_calib = SetupCalib()
-setup_calib.uncalibrated_model = GenerateSubject(DoFName) # TODO by Benjamin
+setup_calib.uncalibrated_model = models.Wu()   #  GenerateSubject(DoFName)  # TODO by Benjamin
 setup_calib.excitation = excitations.Wu_v3()
 setup_calib.calibration = calibrations.Wu_GH_v1(calib_trials, DoFName, vTendon, Model)
 setup_calib.force_calibration = True
@@ -74,7 +75,7 @@ setup_calib.force_calibration = True
 
 # # # TRIALS # # #
 setup_trials = SetupTrial()
-setup_trials.execution = execution.EMG_driven # EMG_driven Hybrid
+setup_trials.execution = execution.EMG_driven( DoFName, vTendon) # EMG_driven Hybrid
 setup_trials.allow_override = True
 ##################
 
