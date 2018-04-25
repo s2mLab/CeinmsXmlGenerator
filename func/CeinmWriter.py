@@ -143,6 +143,7 @@ class CeinmWriter:
 
     def _write_simple_tree(self, parent, tree):
         for branch in tree:
+            #  print(branch)
             if tree[branch] is not None:  # is not None is necessary so 0 is tag and not skipped
                 if isinstance(tree[branch], dict):
                     b = etree.SubElement(parent, branch)

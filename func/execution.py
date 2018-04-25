@@ -10,8 +10,8 @@ class EMG_driven:
     def name():
         return "EMG_driven"
 
-    @staticmethod
-    def dict():
+#    @staticmethod
+    def dict(self):
         return {
             "NMSmodel": {
                 "type": {"openLoop": None},
@@ -33,8 +33,8 @@ class Hybrid:
     def name():
         return "Hybrid"
 
-    @staticmethod
-    def dict():
+ #   @staticmethod
+    def dict(self):
         return {
             "NMSmodel": {
                 "type": {"hybrid": {
