@@ -1,5 +1,7 @@
 import lxml.etree as etree
-
+remove_begin = '__RM_BEGIN__'
+remove_end = '__RM_END__'
+add_colon = '__COLON__'
 
 def write_xml_file(file, xml_root_element, xml_declaration=False, pretty_print=False, encoding='unicode', indent='  '):
     s = etree.tostring(xml_root_element, xml_declaration=xml_declaration, pretty_print=pretty_print, encoding=encoding)
