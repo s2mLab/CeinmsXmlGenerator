@@ -62,24 +62,26 @@ class CeinmWriter:
 
     def run(self, setup_trial):
         # Trials path
-        self.trial_path = setup_trial.trial
-        self.execution = setup_trial.execution
-        self.output_run_path = self.determine_output_run_path()
-        if not os.path.exists(self.output_run_path):
-            os.makedirs(self.output_run_path)
-        else:
-            if not setup_trial.allow_override:
-                raise PermissionError("File already exists, modify the parameters of allow override")
+        for trial in setup_trial.trials:
+            setup_trial.trial = trial
+            self.trial_path = setup_trial.trial
+            self.execution = setup_trial.execution
+            self.output_run_path = self.determine_output_run_path()
+            if not os.path.exists(self.output_run_path):
+                os.makedirs(self.output_run_path)
+            else:
+                if not setup_trial.allow_override:
+                    raise PermissionError("File already exists, modify the parameters of allow override")
 
-        self.setup_path = os.path.join(self.output_run_path, "setup.xml")
-        self.execution_path = os.path.join(self.output_run_path, "execution.xml")
-        self.output_results = self.determine_result_path()
-        if not os.path.exists(self.output_results):
-            os.makedirs(self.output_results)
+            self.setup_path = os.path.join(self.output_run_path, "setup.xml")
+            self.execution_path = os.path.join(self.output_run_path, "execution.xml")
+            self.output_results = self.determine_result_path()
+            if not os.path.exists(self.output_results):
+                os.makedirs(self.output_results)
 
-        self.write_setup_file()
-        self.write_execution_file(self.execution)
-        os.system(self.ceinms_path + os.sep + "CEINMS -S " + self.setup_path)
+            self.write_setup_file()
+            self.write_execution_file(self.execution)
+            os.system(self.ceinms_path + os.sep + "CEINMS -S " + self.setup_path)
 
     def write_calibration_file(self):
         tree = {
@@ -143,6 +145,7 @@ class CeinmWriter:
 
     def _write_simple_tree(self, parent, tree):
         for branch in tree:
+            #  print(branch)
             if tree[branch] is not None:  # is not None is necessary so 0 is tag and not skipped
                 if isinstance(tree[branch], dict):
                     b = etree.SubElement(parent, branch)
@@ -157,6 +160,38 @@ class CeinmWriter:
                         b.text = self._get_values(tree[branch])
             else:
                 etree.SubElement(parent, branch)
+
+    @staticmethod
+    def generate_trial_xml(model, directory, fname):
+        et_trial = etree.Element('inputData', xmlns__COLON__xsi="http://www.w3.org/2001/XMLSchema-instance",
+                                 xsi__COLON__noNamespaceSchemaLocation="inputData.xsd")
+
+        file_name = directory + "/_MuscleAnalysis_Length.sto"
+        if not os.path.isfile(file_name):
+            print("File " + file_name + " does not exist")
+        etree.SubElement(et_trial, "muscleTendonLengthFile").text = file_name
+
+        file_name = directory + "/EMG.sto"
+        if not os.path.isfile(file_name):
+            print("File " + file_name + " does not exist")
+        etree.SubElement(et_trial, "excitationsFile").text = file_name
+
+        file_name = directory + "/InvDyn.sto"
+        if not os.path.isfile(file_name):
+            print("File " + file_name + " does not exist")
+        etree.SubElement(et_trial, "externalTorquesFile").text = file_name
+
+        branch = etree.SubElement(et_trial, 'momentArmsFiles')
+        dof_name = model["DoFName"]
+        for dof in dof_name:
+            tp = etree.SubElement(branch, "momentArmsFile")
+            tp.set("dofName", dof)
+            file_name = directory + "/_MuscleAnalysis_MomentArm_" + dof + ".sto"
+            if not os.path.isfile(file_name):
+                print("File " + file_name + " does not exist")
+            tp.text = file_name
+
+        xml_writer.write_xml_file(fname, et_trial, pretty_print=True)
 
     @staticmethod
     def _get_values(values):
@@ -186,5 +221,5 @@ class CeinmWriter:
         return os.path.join(self.base_path, self._determine_output_common(), new_dir)
 
     def determine_result_path(self):
-        new_dir = "results_" + os.path.splitext(os.path.basename((self.trial_path)))[0]
+        new_dir = "results_" + os.path.splitext(os.path.basename(self.trial_path))[0]
         return os.path.join(self.base_path, self.determine_output_run_path(), new_dir)

@@ -1,55 +1,44 @@
+class Execution:
+    def __init__(self, dofs, v_tendon):
+        self.dofs = dofs
+        self.v_tendon = v_tendon
 
-class Stiff:
+
+class EMG_driven(Execution):
+    def __init__(self, dofs, v_tendon):
+        super(EMG_driven, self).__init__(dofs, v_tendon)
+
     @staticmethod
     def name():
-        return "Stiff"
+        return "EMG_driven"
 
-    @staticmethod
-    def dict():
+    def dict(self):
         return {
             "NMSmodel": {
                 "type": {"openLoop": None},
-                "tendon": {"stiff": None},
+                "tendon": {self.v_tendon: None},
                 "activation": {"exponential": None}
             },
             "online": None,
-            "elaboratedDoFs": {}
+            "elaboratedDoFs": self.dofs
         }
 
 
-class Elastic:
+class Hybrid(Execution):
+    def __init__(self, dofs, v_tendon):
+        super(Hybrid, self).__init__(dofs, v_tendon)
+
     @staticmethod
     def name():
-        return "Elastic"
+        return "Hybrid"
 
-    @staticmethod
-    def dict():
-        return {
-            "NMSmodel": {
-                "type": {"openLoop": None},
-                "tendon": {"equilibriumElastic": None},
-                "activation": {"exponential": None}
-            },
-            "online": None,
-            "elaboratedDoFs": {}
-        }
-
-
-class Hybrid:
-    @staticmethod
-    def name():
-        return "Elastic"
-
-    @staticmethod
-    def dict():
+    def dict(self):
         return {
             "NMSmodel": {
                 "type": {"hybrid": {
-                    "dofSet": ("sternoclavicular_r1", "sternoclavicular_r2", "Acromioclavicular_r1",
-                               "Acromioclavicular_r2", "Acromioclavicular_r3", "shoulder_plane", "shoulder_ele",
-                               "shoulder_rotation"),
+                    "dofSet": self.dofs,
                     "alpha": 1,
-                    "beta": 5,
+                    "beta":  5,
                     "gamma": 5,
                     "synthMTUs": ("CORB", "LVS", "PECM1", "PECM3", "PMN", "RMJ1", "RMJ2", "RMN", "SBCL", "SRA2", "SRA3",
                                   "TMAJ", "TMIN"),
@@ -71,7 +60,5 @@ class Hybrid:
                 "activation": {"exponential": None}
             },
             "online": None,
-            "elaboratedDoFs": ("sternoclavicular_r1", "sternoclavicular_r2", "Acromioclavicular_r1",
-                               "Acromioclavicular_r2", "Acromioclavicular_r3", "shoulder_plane",
-                               "shoulder_ele", "shoulder_rotation")
+            "elaboratedDoFs": self.dofs
         }

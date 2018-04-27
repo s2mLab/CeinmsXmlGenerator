@@ -1,4 +1,3 @@
-from lxml import etree
 import opensim
 
 from func.xml_writer import remove_begin, remove_end
@@ -12,6 +11,10 @@ class Model:
 
     def name(self):
         return self.uncalibrated_model["calibrationInfo"]["uncalibrated"]["subjectID"]
+
+    @staticmethod
+    def setup_model(path, dof_list):
+        raise TypeError("Model should be derived and never called directly")
 
     @staticmethod
     def extract_dof_set_from_osim(dof_list, dof_to_muscles):
@@ -129,10 +132,15 @@ class Model:
 
         dof_to_muscles = {}
         all_muscles = []
+        muscles = []
         for dof in dof_list:
             muscles = Wu.get_all_implied_muscles(osim_model, dof)
             dof_to_muscles[dof] = muscles
             all_muscles += muscles
+
+        if not muscles:
+            raise ValueError("No muscles found")
+
         # Remove duplicates and sorts
         all_muscles = sorted(list(set(muscles)))
 
@@ -203,7 +211,7 @@ class Wu(Model):
                 "yPoints": [0, 0.08, 0.2, 0.55, 1, 1.4, 1.6, 1.7, 1.75]
             },
             "curve__RM_BEGIN__3__RM_END__": {
-                "name": "forceVelocity",
+                "name": "tendonForceStrain",
                 "xPoints": [0, 0.00131, 0.00281, 0.00431, 0.00581, 0.00731, 0.00881, 0.0103, 0.0118, 0.0123, 9.2],
                 "yPoints": [0, 0.0108, 0.0257, 0.0435, 0.0652, 0.0915, 0.123, 0.161, 0.208, 0.227, 345]
             },
