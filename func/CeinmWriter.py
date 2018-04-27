@@ -54,7 +54,7 @@ class CeinmWriter:
 
     def calibrate(self):
         if self.should_force_calibration:
-            self.write_model_file(self.uncalib_model.uncalibrated_model())
+            self.write_model_file(self.uncalib_model.uncalibrated_model)
             self.write_calibration_file()
             self.write_excitation_generator_file(self.excitation)
             self.write_calibration_configuration_file(self.calibration)
@@ -174,8 +174,8 @@ class CeinmWriter:
             return str(values)
 
     def _determine_output_common(self):
-        return self.uncalib_model.name() + "_" + \
-               str(len(self.uncalib_model.uncalibrated_model()["dofSet"])) + "dofs_" + \
+        return self.uncalib_model.type() + self.uncalib_model.name() + "_" + \
+               str(len(self.uncalib_model.uncalibrated_model["dofSet"])) + "dofs_" + \
                self.calibration.name() + "_" + self.excitation.name()
 
     def determine_output_calib_path(self):
