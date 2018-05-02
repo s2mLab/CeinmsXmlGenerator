@@ -1,8 +1,8 @@
 import os
 import glob
-import lxml.etree as etree
 
-from func import CeinmWriter, models, excitations, calibrations, execution, xml_writer
+from func import execution, CeinmWriter
+from func.CeinmWriter import CeinmWriter
 
 
 def determine__base_paths():
@@ -17,8 +17,22 @@ def determine__base_paths():
     return base_path, ceinms_path
 
 
-def prepare_setup(base_path, model_name, subject, uncalib_model_path, v_calib_trials, dof_list, dof, v_tendon, trials,
-                  force_recalib):
+def build_and_setup_model(base_path, subject, model_name, uncalib_model_path,
+                          dof_list, dof, trials, v_calib_trials, v_tendon,
+                          model_type, excitations_type, calibrations_type, force_recalib):
+    uncalib_model = model_type(uncalib_model_path, dof_list)
+    excitation = excitations_type()
+    model, subject_path, dof_name, calib_trials, trials = prepare_model_and_trials(subject, base_path,
+                                                                                   model_name, dof,
+                                                                                   v_calib_trials, trials)
+    calib = calibrations_type(calib_trials, dof_name, v_tendon, model)
+    setup_calib, setup_trials = prepare_setup(uncalib_model, dof_name, trials, excitation,
+                                              calib, v_tendon, force_recalib)
+
+    return model, setup_calib, setup_trials
+
+
+def prepare_model_and_trials(subject, base_path, model_name, dof, v_calib_trials, trials):
     subject_path = "./" + subject + "/Trials/"
     model = load_model(model_name)
 
@@ -46,12 +60,12 @@ def prepare_setup(base_path, model_name, subject, uncalib_model_path, v_calib_tr
     else:
         raise ValueError("Wrong value for v_calib_trials")
 
-    # # # CALIB # # #
-    setup_calib = CeinmWriter.SetupCalib()
-    setup_calib.uncalibrated_model = models.Wu(uncalib_model_path, dof_list)
-    setup_calib.excitation = excitations.Wu_v3()
-    setup_calib.calibration = calibrations.Wu_GH_v1(calib_trials, dof_name, v_tendon, model)
-    setup_calib.force_calibration = force_recalib
+    # regarder tous les dossiers et générer les xml
+    for subdir in next(os.walk(os.path.join(base_path, subject_path)))[1]:
+        fname = os.path.join(base_path, subject_path, subdir + '.xml')
+        if subdir.startswith(model["ModelName"].lower()) and not os.path.isfile(fname):
+            print("Generate xml for trial: " + subdir)
+            CeinmWriter.generate_trial_xml(model, os.path.join(base_path, subject_path, subdir), fname)
 
     # # # GENERATE trials.xml # # #
     if trials.lower() == 'all':
@@ -72,18 +86,23 @@ def prepare_setup(base_path, model_name, subject, uncalib_model_path, v_calib_tr
     print('********* Files of Interest **********')
     print(_trials)
 
-    # regarder tous les dossiers et générer les xml
-    for subdir in next(os.walk(os.path.join(base_path, subject_path)))[1]:
-        fname = os.path.join(base_path, subject_path, subdir+'.xml')
-        if subdir.startswith(model["ModelName"].lower()) and not os.path.isfile(fname):
-            print("Generate xml for trial: " + subdir)
-            CeinmWriter.generate_trial_xml(model, os.path.join(base_path, subject_path, subdir), fname)
+    return model, subject_path, dof_name, calib_trials, trials
+
+
+def prepare_setup(uncalibrated_model, dof_name, trials, excitations, calibration, v_tendon,  force_recalib):
+
+    # # # CALIB # # #
+    setup_calib = CeinmWriter.SetupCalib()
+    setup_calib.uncalibrated_model = uncalibrated_model
+    setup_calib.excitation = excitations
+    setup_calib.calibration = calibration
+    setup_calib.force_calibration = force_recalib
 
     # # # TRIALS # # #
     setup_trials = CeinmWriter.SetupTrial()
     setup_trials.execution = execution.EMG_driven(dof_name, v_tendon)  # EMG_driven Hybrid
     setup_trials.allow_override = True
-    setup_trials.trials = _trials
+    setup_trials.trials = trials
     ##################
     return setup_calib, setup_trials
 
@@ -151,3 +170,6 @@ def load_model(model_name):
     else:
         raise NotImplementedError("Wrong model_name")
 
+
+def write_model(model, ):
+    pass

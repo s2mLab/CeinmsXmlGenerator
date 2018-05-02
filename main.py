@@ -1,5 +1,5 @@
+from func import models, excitations, calibrations, utils
 from func.CeinmWriter import CeinmWriter
-from func import utils
 
 # Define base path
 base_path, ceinms_path = utils.determine__base_paths()
@@ -15,12 +15,17 @@ v_calib_trials = 1
 v_tendon = 'stiff'  # | 'elastic'
 trials = 'All'  # | 'All' | 'AllButCalib' | 'Calib'
 force_recalib = False
+
+model_type = models.Wu
+excitations_type = excitations.Wu_v3
+calibrations_type = calibrations.Wu_GH_v1
 # # # END OF THE MAIN VARIABLES # # #
 
 # Setup the trials
-setup_calib, setup_trials = utils.prepare_setup(base_path, model_name, subject, uncalib_model_path,
-                                                v_calib_trials, dof_list, dof, v_tendon, trials, force_recalib)
-
+model, setup_calib, setup_trials = utils.build_and_setup_model(base_path, subject, model_name, uncalib_model_path,
+                                                               dof_list, dof, trials, v_calib_trials, v_tendon,
+                                                               model_type, excitations_type, calibrations_type,
+                                                               force_recalib)
 
 # Write configuration and calibration files
 cw = CeinmWriter(base_path, setup_calib, ceinms_path)

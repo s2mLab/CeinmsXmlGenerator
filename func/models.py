@@ -150,6 +150,14 @@ class Model:
         return model_name, mtu_set, dof_set
 
     @staticmethod
+    def update_osim_file(osim_path, mtu_set, dof_set):
+        osim_model = opensim.Model(osim_path)
+        osim_model.initSystem()
+
+        mtu_set = Wu.extract_mtu_from_osim(osim_model, all_muscles)
+        dof_set = Wu.extract_dof_set_from_osim(dof_list, dof_to_muscles)
+
+    @staticmethod
     def sort_muscle_dict(to_sort):
         sorted_key = sorted(to_sort, key=str.lower)
         to_sort_sorted = {}

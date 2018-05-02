@@ -54,6 +54,7 @@ class CeinmWriter:
 
     def calibrate(self):
         if self.should_force_calibration:
+            # Calibrate the model
             self.write_model_file(self.uncalib_model.uncalibrated_model)
             self.write_calibration_file()
             self.write_excitation_generator_file(self.excitation)
