@@ -2,7 +2,7 @@ import os
 
 import lxml.etree as etree
 
-from func import xml_writer
+from func import xml_writer, utils
 
 
 class SetupCalib:
@@ -20,11 +20,9 @@ class SetupTrial:
         self.allow_override = False
 
 
-class CeinmWriter:
+class Writer:
     def __init__(self, base_output_path, setup_calib, ceinms_path):
-        self.uncalib_model = setup_calib.uncalibrated_model
-        self.calibration = setup_calib.calibration
-        self.excitation = setup_calib.excitation
+        self.setup_calib = setup_calib
         self.ceinms_path = ceinms_path
 
         # Define a nice output name for the folder
@@ -55,11 +53,14 @@ class CeinmWriter:
     def calibrate(self):
         if self.should_force_calibration:
             # Calibrate the model
-            self.write_model_file(self.uncalib_model.uncalibrated_model)
+            self.write_model_file(self.setup_calib.uncalibrated_model.uncalibrated_model)
             self.write_calibration_file()
-            self.write_excitation_generator_file(self.excitation)
-            self.write_calibration_configuration_file(self.calibration)
+            self.write_excitation_generator_file(self.setup_calib.excitation)
+            self.write_calibration_configuration_file(self.setup_calib.calibration)
             os.system(self.ceinms_path + os.sep + "CEINMScalibrate -S " + self.calibration_path)
+
+            # Write the calibrated model
+            utils.write_model(self.setup_calib, self.calibrated_model_path)
 
     def run(self, setup_trial):
         # Trials path
@@ -210,9 +211,9 @@ class CeinmWriter:
             return str(values)
 
     def _determine_output_common(self):
-        return self.uncalib_model.type() + self.uncalib_model.name() + "_" + \
-               str(len(self.uncalib_model.uncalibrated_model["dofSet"])) + "dofs_" + \
-               self.calibration.name() + "_" + self.excitation.name()
+        return self.setup_calib.uncalibrated_model.type() + self.setup_calib.uncalibrated_model.name() + "_" + \
+               str(len(self.setup_calib.uncalibrated_model.uncalibrated_model["dofSet"])) + "dofs_" + \
+               self.setup_calib.calibration.name() + "_" + self.setup_calib.excitation.name()
 
     def determine_output_calib_path(self):
         return os.path.join(self.base_path, self._determine_output_common(), "calib", )

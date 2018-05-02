@@ -1,9 +1,10 @@
 import opensim
+import math
 
 from func.xml_writer import remove_begin, remove_end
 
 
-class Model:
+class OsimModel:
     def __init__(self, model_path, dof_list):
         self.osim_path = model_path
         self.dof_list = dof_list
@@ -150,12 +151,21 @@ class Model:
         return model_name, mtu_set, dof_set
 
     @staticmethod
-    def update_osim_file(osim_path, mtu_set, dof_set):
-        osim_model = opensim.Model(osim_path)
+    def write_model(osim_old_model_path, osim_new_model_path, new_params):
+        osim_model = opensim.Model(osim_old_model_path)
         osim_model.initSystem()
+        model_name = osim_model.getModel().getName()
 
-        mtu_set = Wu.extract_mtu_from_osim(osim_model, all_muscles)
-        dof_set = Wu.extract_dof_set_from_osim(dof_list, dof_to_muscles)
+        for mtu in new_params.xpath('mtuSet/mtu'):
+            mtu_name = mtu.xpath('name')[0].text
+            muscle = osim_model.getMuscles().get(mtu_name)
+            muscle.set_optimal_fiber_length(float(mtu.xpath('optimalFibreLength')[0].text))
+            muscle.set_tendon_slack_length(float(mtu.xpath('tendonSlackLength')[0].text))
+            muscle.set_max_isometric_force(float(mtu.xpath('strengthCoefficient')[0].text) * float(mtu.xpath('maxIsometricForce')[0].text))
+            muscle.set_pennation_angle_at_optimal(float(mtu.xpath('pennationAngle')[0].text) * 180.0 / math.pi)  # warning in rad
+
+        osim_model.setName(model_name + '_optCEINMS')
+        osim_model.printToXML(osim_new_model_path)
 
     @staticmethod
     def sort_muscle_dict(to_sort):
@@ -166,7 +176,7 @@ class Model:
         return to_sort_sorted
 
 
-class Wu(Model):
+class Wu(OsimModel):
     def __init__(self, model_path, dof_list):
         super(Wu, self).__init__(model_path, dof_list)
 

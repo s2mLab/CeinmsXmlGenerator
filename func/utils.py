@@ -1,8 +1,9 @@
 import os
 import glob
+from lxml import etree
 
 from func import execution, CeinmWriter
-from func.CeinmWriter import CeinmWriter
+from func.CeinmWriter import Writer
 
 
 def determine__base_paths():
@@ -65,7 +66,7 @@ def prepare_model_and_trials(subject, base_path, model_name, dof, v_calib_trials
         fname = os.path.join(base_path, subject_path, subdir + '.xml')
         if subdir.startswith(model["ModelName"].lower()) and not os.path.isfile(fname):
             print("Generate xml for trial: " + subdir)
-            CeinmWriter.generate_trial_xml(model, os.path.join(base_path, subject_path, subdir), fname)
+            Writer.generate_trial_xml(model, os.path.join(base_path, subject_path, subdir), fname)
 
     # # # GENERATE trials.xml # # #
     if trials.lower() == 'all':
@@ -171,5 +172,11 @@ def load_model(model_name):
         raise NotImplementedError("Wrong model_name")
 
 
-def write_model(model, ):
-    pass
+def write_model(setup_calib, calibrated_model_path):
+    osim_model_old = setup_calib.uncalibrated_model.osim_path
+    osim_model_new = osim_model_old[:-5] + '_optCEINMS.osim'
+
+    calib_filename = calibrated_model_path
+    calib_tree = etree.parse(calib_filename).getroot() # print etree.tostring(tree.getroot(), pretty_print=True)
+
+    setup_calib.uncalibrated_model.write_model(osim_model_old, osim_model_new, calib_tree)

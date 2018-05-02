@@ -1,5 +1,5 @@
 from func import models, excitations, calibrations, utils
-from func.CeinmWriter import CeinmWriter
+from func.CeinmWriter import Writer
 
 # Define base path
 base_path, ceinms_path = utils.determine__base_paths()
@@ -28,7 +28,7 @@ model, setup_calib, setup_trials = utils.build_and_setup_model(base_path, subjec
                                                                force_recalib)
 
 # Write configuration and calibration files
-cw = CeinmWriter(base_path, setup_calib, ceinms_path)
+cw = Writer(base_path, setup_calib, ceinms_path)
 
 # Run calibration process if needed
 cw.calibrate()
