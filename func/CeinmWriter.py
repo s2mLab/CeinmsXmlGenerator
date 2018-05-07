@@ -4,6 +4,8 @@ import lxml.etree as etree
 
 from func import xml_writer, utils
 
+from func.Analyses_lifting import result1
+
 
 class SetupCalib:
     def __init__(self):
@@ -62,9 +64,10 @@ class Writer:
             # Write the calibrated model
             utils.write_model(self.setup_calib, self.calibrated_model_path)
 
-    def run(self, setup_trial):
+    def run(self, setup_trial, excitations_type):
         # Trials path
         for trial in setup_trial.trials:
+            print('****** ' + trial + ' ********')
             setup_trial.trial = trial
             self.trial_path = setup_trial.trial
             self.execution = setup_trial.execution
@@ -84,6 +87,12 @@ class Writer:
             self.write_setup_file()
             self.write_execution_file(self.execution)
             os.system(self.ceinms_path + os.sep + "CEINMS -S " + self.setup_path)
+
+            #Analyses_lifting
+            result1(self.trial_path, self.output_results, excitations_type)
+
+            a=1  #  TODO mickael analyses lifting
+
 
     def write_calibration_file(self):
         tree = {
@@ -216,7 +225,7 @@ class Writer:
                self.setup_calib.calibration.name() + "_" + self.setup_calib.excitation.name()
 
     def determine_output_calib_path(self):
-        return os.path.join(self.base_path, self._determine_output_common(), "calib", )
+        return os.path.join(self.base_path, self._determine_output_common(), "calib")
 
     def determine_output_run_path(self):
         new_dir = "Trials_Exec" + self.execution.name()

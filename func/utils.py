@@ -13,21 +13,24 @@ def determine__base_paths():
     elif os.uname()[1] == 'bimec29-kinesio':
         base_path = "/home/pariterre/Dropbox/test_1/"
         ceinms_path = "~/Documents/Laboratoire/Programmation/CEINMS/ceinms/release/bin"
+    elif os.uname()[1] == 'mickael-XPS-15-9560':
+        base_path = "/home/mickael/Documents/projetCEINMS/test_1/"
+        ceinms_path = "/home/mickael/miniconda3/envs/CEINMS/bin/"
     else:
         raise NotImplementedError("Please add your computer to determine_path.py script")
     return base_path, ceinms_path
 
 
 def build_and_setup_model(base_path, subject, model_name, uncalib_model_path,
-                          dof_list, dof, trials, v_calib_trials, v_tendon,
-                          model_type, excitations_type, calibrations_type, force_recalib):
-    uncalib_model = model_type(uncalib_model_path, dof_list)
+                          dof, trials, v_calib_trials, v_tendon,
+                          model_type, excitations_type, calibrations_type, execution_type, force_recalib):
     excitation = excitations_type()
     model, subject_path, dof_name, calib_trials, trials = prepare_model_and_trials(subject, base_path,
                                                                                    model_name, dof,
                                                                                    v_calib_trials, trials)
+    uncalib_model = model_type(uncalib_model_path, dof_name)
     calib = calibrations_type(calib_trials, dof_name, v_tendon, model)
-    setup_calib, setup_trials = prepare_setup(uncalib_model, dof_name, trials, excitation,
+    setup_calib, setup_trials = prepare_setup(uncalib_model, dof_name, trials, excitation, execution_type,
                                               calib, v_tendon, force_recalib)
 
     return model, setup_calib, setup_trials
@@ -87,10 +90,10 @@ def prepare_model_and_trials(subject, base_path, model_name, dof, v_calib_trials
     print('********* Files of Interest **********')
     print(_trials)
 
-    return model, subject_path, dof_name, calib_trials, trials
+    return model, subject_path, dof_name, calib_trials, _trials
 
 
-def prepare_setup(uncalibrated_model, dof_name, trials, excitations, calibration, v_tendon,  force_recalib):
+def prepare_setup(uncalibrated_model, dof_name, trials, excitations, execution_type, calibration, v_tendon, force_recalib):
 
     # # # CALIB # # #
     setup_calib = CeinmWriter.SetupCalib()
@@ -101,7 +104,7 @@ def prepare_setup(uncalibrated_model, dof_name, trials, excitations, calibration
 
     # # # TRIALS # # #
     setup_trials = CeinmWriter.SetupTrial()
-    setup_trials.execution = execution.EMG_driven(dof_name, v_tendon)  # EMG_driven Hybrid
+    setup_trials.execution = execution.Hybrid(dof_name, v_tendon)  # EMG_driven Hybrid TODO choice from main
     setup_trials.allow_override = True
     setup_trials.trials = trials
     ##################
