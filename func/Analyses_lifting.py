@@ -106,7 +106,7 @@ def result1(trial_path, dir_result, excitations_type):
 
 
 
-#           rmsTorques[count] = sqrt(mean_squared_error(npx, npy))
+#           rmsTorques[count] = sqrt(mean_squared_error(npx, npy)) #TODO Mickael creer vecteur avec temps plus similaires
 
 
             ax[row, col].plot(time_emgCEINMS, npx, label='ceinms')

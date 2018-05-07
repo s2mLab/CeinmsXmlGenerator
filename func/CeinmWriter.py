@@ -91,7 +91,6 @@ class Writer:
             #Analyses_lifting
             result1(self.trial_path, self.output_results, excitations_type)
 
-            a=1  #  TODO mickael analyses lifting
 
 
     def write_calibration_file(self):

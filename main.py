@@ -19,7 +19,7 @@ force_recalib = False
 model_type = models.Wu
 excitations_type = excitations.Wu_v3
 calibrations_type = calibrations.Wu_GH_v1
-execution_type = []  # TODO execution.EMGdriven # EMGdriven | Hydrib | Static_optim
+execution_type = []  # TODO with Benjamin execution.EMGdriven # EMGdriven | Hydrib | Static_optim
 # # # END OF THE MAIN VARIABLES # # #
 
 # Setup the trials
