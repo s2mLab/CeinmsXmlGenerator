@@ -35,7 +35,7 @@ class Hybrid(Execution):
 # calculate the rms activation from staticoptim (process in Opensim)
 # calculate the rms emg excitation (only muscles used)
 # calculate the rms join torques (only joint used)
-
+# ensure that 1% rms on joint torque = 1% rms on emgs and 10-20% rms of least excitations
 
 
     def dict(self):

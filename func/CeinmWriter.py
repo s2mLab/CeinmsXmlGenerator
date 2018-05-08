@@ -4,7 +4,7 @@ import lxml.etree as etree
 
 from func import xml_writer, utils
 
-from func.Analyses_lifting import result1
+from func.Analyses_lifting import compare_msk
 
 
 class SetupCalib:
@@ -89,7 +89,7 @@ class Writer:
             os.system(self.ceinms_path + os.sep + "CEINMS -S " + self.setup_path)
 
             #Analyses_lifting
-            result1(self.trial_path, self.output_results, excitations_type)
+            compare_msk(self.trial_path, self.output_results, excitations_type)
 
 
 

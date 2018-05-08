@@ -12,7 +12,7 @@ subject = 'DapO'
 dof = 'G'  # 'G' | 'SAG"
 #dof_list = ("shoulder_ele", "shoulder_plane", "shoulder_rotation")
 v_calib_trials = 1
-v_tendon = 'stiff'  # | 'elastic'
+v_tendon = 'stiff' #'stiff' | 'equilibriumElastic'
 trials = 'All'  # | 'All' | 'AllButCalib' | 'Calib'
 force_recalib = False
 
