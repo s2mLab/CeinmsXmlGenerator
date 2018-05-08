@@ -8,6 +8,8 @@ import numpy as np
 from sklearn.metrics import mean_squared_error
 from math import sqrt
 
+from scipy.interpolate import interp1d
+
 
 
 import os
@@ -78,7 +80,7 @@ def result1(trial_path, dir_result, excitations_type):
 
     rmsEMG = np.zeros(nMTU)*np.nan
     time_emgCEINMS = emgCEINMS.getIndependentColumn()
-    time_emg =  emg.getIndependentColumn()
+    time_emg = np.asarray(emg.getIndependentColumn())+0.015 # emgDelay TODO could be read in calibrated model
 
 
     for MTU in emgCEINMS.getColumnLabels():
@@ -105,14 +107,15 @@ def result1(trial_path, dir_result, excitations_type):
                     npy[i] = muscle_names[i] * y.getElt(i, 0)
 
 
+            f = interp1d(time_emg, npy, 'nearest') # nearest in this case since emg high frequency
+            npy_tnorm = f(time_emgCEINMS)
+            rmsEMG[count] = sqrt(mean_squared_error(npx, npy_tnorm))
+            print('RMS error in %s: %f Nm' % (MTU, rmsEMG[count]))
 
-#           rmsTorques[count] = sqrt(mean_squared_error(npx, npy)) #TODO Mickael creer vecteur avec temps plus similaires
-
-
-            ax[row, col].plot(time_emgCEINMS, npx, label='ceinms')
-            ax[row, col].plot(time_emg, npy, label='mesured')
-            ax[row, col].set_title(MTU)
-            #       ax[row, col].set_title(MTU+ '_rms(%f)' % (rmsMTU[count]) )
+            ax[row, col].plot(time_emg, npy, 'k', label='mesured')
+            ax[row, col].plot(time_emgCEINMS, npy_tnorm, 'k.', label='interp')
+            ax[row, col].plot(time_emgCEINMS, npx, 'b', label='ceinms')
+            ax[row, col].set_title(MTU + '_rms(%f)' % (rmsEMG[count]))
 
             if col == 0:
                 plt.ylabel('Excitation [%]')
@@ -167,11 +170,10 @@ def result1(trial_path, dir_result, excitations_type):
             npy[i] = y.getElt(i, 0)
 
         rmsTorques[count] = sqrt(mean_squared_error(npx, npy))
-
         print('RMS error in %s: %f Nm' % (dof, rmsTorques[count]))
 
-        ax[row, col].plot(npx, label='ceinms')
-        ax[row, col].plot(npy, label='osim')
+        ax[row, col].plot(npy,'k', label='osim')
+        ax[row, col].plot(npx,'b', label='ceinms')
         ax[row, col].set_title(dof+ '_rms(%f)' % (rmsTorques[count]) )
 
         if col==0:
@@ -188,11 +190,29 @@ def result1(trial_path, dir_result, excitations_type):
     ax[0,0].legend()
     plt.tight_layout()
 
-    return rmsTorques  #  rmsEMG,
+    return rmsTorques, rmsEMG,
 
 
 
+def time_normalization(x, time_vector=np.linspace(0, 100, 101), axis=-1):
+    """
+    Time normalization used for temporal alignment of data
 
+    Parameters
+    ----------
+    x : np.ndarray
+        matrix or vector to interpolate over
+    time_vector : np.ndarray
+        desired time vector (0 to 100 by step of 1 by default)
+    axis : int
+        specifies the axis along which to interpolate. Interpolation defaults to the last axis (over frames)
 
+    Returns
+    -------
+    np.ndarray
+    """
+    original_time_vector = np.linspace(time_vector[0], time_vector[-1], x.shape[axis])
+    f = interp1d(original_time_vector, x, axis=axis)
+    return f(time_vector)
 
 

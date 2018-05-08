@@ -3,7 +3,6 @@ class Execution:
         self.dofs = dofs
         self.v_tendon = v_tendon
 
-
 class EMG_driven(Execution):
     def __init__(self, dofs, v_tendon):
         super(EMG_driven, self).__init__(dofs, v_tendon)
@@ -31,6 +30,13 @@ class Hybrid(Execution):
     @staticmethod
     def name():
         return "Hybrid"
+
+
+# calculate the rms activation from staticoptim (process in Opensim)
+# calculate the rms emg excitation (only muscles used)
+# calculate the rms join torques (only joint used)
+
+
 
     def dict(self):
         return {
