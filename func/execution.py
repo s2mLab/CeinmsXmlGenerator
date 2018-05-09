@@ -69,7 +69,7 @@ class Hybrid_Wu_G(Execution):
 
 class Static_optim_Wu_G(Execution):
     def __init__(self, dofs, v_tendon):
-        super(Static_optim_G, self).__init__(dofs, v_tendon)
+        super(Static_optim_Wu_G, self).__init__(dofs, v_tendon)
 
     @staticmethod
     def name():
@@ -175,7 +175,7 @@ class Hybrid_Wu_SAG(Execution):
 
 class Static_optim_Wu_SAG(Execution):
     def __init__(self, dofs, v_tendon):
-        super(Static_optim_SAG, self).__init__(dofs, v_tendon)
+        super(Static_optim_Wu_SAG, self).__init__(dofs, v_tendon)
 
     @staticmethod
     def name():
