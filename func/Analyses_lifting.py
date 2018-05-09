@@ -1,6 +1,9 @@
 import opensim as osim
 
-#import matplotlib
+import matplotlib as mpl
+# mpl.use('Agg')
+
+import matplotlib.style
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 
@@ -14,7 +17,30 @@ from scipy.interpolate import interp1d
 import os
 
 
+def compare_msk(trial_path, dir_result, excitations_type):
+    dir_trial = trial_path[:-4]+os.sep
+    # TODO change names according to Romain's code
 
+    mpl.style.use('ggplot')
+
+    pp = PdfPages(dir_result + os.sep + 'results.pdf')
+
+    rmsTorque,figTorque = compare_xy(dir_result, 'Torques', dir_trial, 'InvDyn', 'Torques','Nm','_moment')
+    rmsActivation, figActivation = compare_xy(dir_result, 'Activations', dir_trial, 'StaticOptimization_activation', 'Activation','0-1')
+    rmsForce, figForce = compare_xy(dir_result, 'MuscleForces', dir_trial, 'StaticOptimization_force', 'Muscle Forces','N')
+    rmsEMG, figEMG = compare_emg(dir_trial, dir_result, excitations_type, 'excitation', '0-1')
+
+    figDisloc, figGH = compare_gh_forces(trial_path, dir_result)
+
+    pp.savefig(figEMG, dpi=300, orientation='landscape', papertype='legal')
+    pp.savefig(figTorque, dpi=300, orientation='landscape', papertype='legal')
+    pp.savefig(figActivation, dpi=300, orientation='landscape', papertype='legal')
+    pp.savefig(figForce, dpi=300, orientation='landscape', papertype='legal')
+    pp.savefig(figDisloc, dpi=300, orientation='landscape', papertype='legal')
+    pp.savefig(figGH, dpi=300, orientation='landscape', papertype='legal')
+    pp.close()
+
+    return rmsTorque, rmsActivation, rmsForce, #rmsJRF
 
 def compare_emg(dir_trial, dir_result, excitations_type, name, units):
 
@@ -77,32 +103,12 @@ def compare_emg(dir_trial, dir_result, excitations_type, name, units):
         else:
             print('no EMG')
 
+    plt.legend()
+    plt.subplots_adjust(left=0.125, right=0.9, bottom=0.1, top=0.9, wspace=0.2, hspace=0.2)
+    #plt.tight_layout(rect=[0, 0.03, 1, 0.95],pad=0.2)
+
+
     return rmsEMG, fig
-
-
-def compare_msk(trial_path, dir_result, excitations_type):
-    dir_trial = trial_path[:-4]+os.sep
-    # TODO change names according to Romain's code
-
-    pp = PdfPages(dir_result + os.sep + 'results.pdf')
-
-    rmsTorque,figTorque = compare_xy(dir_result, 'Torques', dir_trial, 'InvDyn', 'Torques','Nm','_moment')
-    rmsActivation, figActivation = compare_xy(dir_result, 'Activations', dir_trial, 'StaticOptimization_activation', 'Activation','0-1')
-    rmsForce, figForce = compare_xy(dir_result, 'MuscleForces', dir_trial, 'StaticOptimization_force', 'Muscle Forces','N')
-    #rmsJRF, figJRF = compare_xy(dir_result, '', dir_trial, '_JointReaction_ReactionLoads', 'GH force','N') # warning : only the first 3 columns
-    rmsEMG, figEMG = compare_emg(dir_trial, dir_result, excitations_type, 'excitation', '0-1')
-
-    figGH = compare_gh_forces(trial_path, dir_result)
-
-    pp.savefig(figEMG)
-    pp.savefig(figTorque)
-    pp.savefig(figActivation)
-    pp.savefig(figForce)
-    pp.savefig(figGH)
-
-    pp.close()
-
-    return rmsTorque, rmsActivation, rmsForce, #rmsJRF
 
 
 
@@ -110,16 +116,18 @@ def compare_gh_forces(trial_path, dir_result):
     dir_trial = trial_path[:-4] + os.sep
 
     GHosim = read_STO(dir_trial, '_JointReaction_ReactionLoads')
+    time_osim = np.asarray(GHosim.getIndependentColumn())
+
     Fx = osim2np(GHosim.getDependentColumnAtIndex(0))
     Fy = osim2np(GHosim.getDependentColumnAtIndex(1))
     Fz = osim2np(GHosim.getDependentColumnAtIndex(2))
-    F = np.vstack( (Fx, Fy, Fz) )
+    Fosim = np.vstack( (Fx, Fy, Fz) )
     # var = GHosim.getColumnLabels()
     # mx, my, mz, x, y, z for index 3 to 8
 
     # calculate norm of GH force
-    normF = np.linalg.norm(F, axis=0)
-    unitF = F / normF # TODO: check may be wrong
+    normFosim = np.linalg.norm(Fosim, axis=0)
+    unitFosim = Fosim / normFosim # TODO: check may be wrong
 
     # TODO: validate in opensim the directions of the forces ... 0 deg being forward
 
@@ -140,9 +148,18 @@ def compare_gh_forces(trial_path, dir_result):
         ax[i].plot(xp,yp,'k-', xm, ym,'k--')
         ax[i].axis('equal')
 
-    ax[0].plot(unitF[0, :], unitF[1, :], '.')
+    ax[0].plot(unitFosim[0, :], unitFosim[1, :], '.')
 
-    return fig
+    fig2, ax2 = plt.subplots(1,3, sharex=True)
+    manager = plt.get_current_fig_manager()
+    manager.window.showMaximized()
+    for i in [0, 1, 2]:
+        ax2[i].plot(time_osim, Fosim[i, :], 'r', label='osim')
+        #ax2[i].plot(time_ceinms, Fceinms[i,:], 'b', label='ceinms')
+    plt.legend()
+
+
+    return fig, fig2
 
 
 def compare_xy(dir1name, param1name, dir2name, param2name, name, units, suffix=''):
@@ -201,8 +218,10 @@ def compare_xy(dir1name, param1name, dir2name, param2name, name, units, suffix='
 
 
     ax[0, 0].legend()
-    plt.tight_layout()
+    #plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+    plt.subplots_adjust(left=0.125, right=0.9, bottom=0.1, top=0.9, wspace=0.2, hspace=0.2)
     #plt.show()
+    plt.savefig(dir1name + os.sep + name)
 
     return rmsValue, fig
 
