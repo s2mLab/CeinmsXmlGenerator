@@ -63,6 +63,7 @@ class Writer:
 
             # Write the calibrated model
             utils.write_model(self.setup_calib, self.calibrated_model_path)
+            #TODO check if the calibration has created the file ... else error
 
     def run(self, setup_trial, excitations_type):
         # Trials path
@@ -175,6 +176,8 @@ class Writer:
     def generate_trial_xml(model, directory, fname):
         et_trial = etree.Element('inputData', xmlns__COLON__xsi="http://www.w3.org/2001/XMLSchema-instance",
                                  xsi__COLON__noNamespaceSchemaLocation="inputData.xsd")
+
+        # ToDo modify the names according to Romain ... perhaps store names in utils to be used later?
 
         file_name = directory + "/_MuscleAnalysis_Length.sto"
         if not os.path.isfile(file_name):

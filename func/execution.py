@@ -37,8 +37,7 @@ class Hybrid(Execution):
 # calculate the rms join torques (only joint used)
 # ensure that 1% rms on joint torque = 1% rms on emgs and 10-20% rms of least excitations
 
-
-    def dict(self):
+def dict(self):
         return {
             "NMSmodel": {
                 "type": {"hybrid": {
@@ -49,7 +48,7 @@ class Hybrid(Execution):
                     "synthMTUs": ("CORB", "LVS", "PECM1", "PECM3", "PMN", "RMJ1", "RMJ2", "RMN", "SBCL", "SRA2", "SRA3",
                                   "TMAJ", "TMIN"),
                     "adjustMTUs": ("DELT1", "DELT2", "DELT3", "INFSP", "LAT", "PECM2", "SRA1", "SUBSC", "SUPSP", "TRP1",
-                                   "TRP2", "TRP3", "TRP4"),
+                                   "TRP2", "TRP3", "TRP4", "bic_l", "bic_b", "tric_long"),
                     "algorithm": {
                         "simulatedAnnealing": {
                             "noEpsilon": 4,
@@ -87,7 +86,7 @@ class Static_optim(Execution):
                     "gamma": 0,
                     "synthMTUs": ("CORB", "LVS", "PECM1", "PECM3", "PMN", "RMJ1", "RMJ2", "RMN", "SBCL", "SRA2", "SRA3",
                                   "TMAJ", "TMIN","DELT1", "DELT2", "DELT3", "INFSP", "LAT", "PECM2", "SRA1", "SUBSC", "SUPSP", "TRP1",
-                                   "TRP2", "TRP3", "TRP4"),
+                                   "TRP2", "TRP3", "TRP4", "bic_l", "bic_b", "tric_long"),
                     "adjustMTUs": (),
                     "algorithm": {
                         "simulatedAnnealing": {

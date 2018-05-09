@@ -36,20 +36,21 @@ def build_and_setup_model(base_path, subject, model_name, uncalib_model_path,
     return model, setup_calib, setup_trials
 
 
-def prepare_model_and_trials(subject, base_path, model_name, dof, v_calib_trials, trials):
+def prepare_model_and_trials(subject, base_path, model_name, joints, v_calib_trials, trials):
     subject_path = "./" + subject + "/Trials/"
     model = load_model(model_name)
 
     if model["ModelName"].lower() == 'wu' or model["ModelName"].lower() == 'das3':
-        if dof.lower() == 'g':
+        if joints.lower() == 'g':
             dof_name = model["DoFName"][-3:]
+        elif joints.lower() == 'sag':
+            dof_name = model["DoFName"][0:2] + model["DoFName"][3:]  # improve?
         else:
             raise ValueError("Wrong value for dof")
-    elif dof.lower() == 'sag':
-        dof_name = model["DoFName"][0:2] + model["DoFName"][3:]  # improve?
     else:
         raise ValueError("Wrong value for model")
-    print("DoF for CEINMS are: " + str(dof_name))
+
+    print("********* DoF for CEINMS are: %s ************" % str(dof_name))
 
     # # # CHOOSE CalibTrials and Trials # # #
     # xHy_z   with x=6|12|18 y=1-6  z=1-3
@@ -125,7 +126,8 @@ def load_model(model_name):
                              "SRA1", "SRA2", "SRA3", "PMN",
                              "DELT1", "DELT2", "DELT3",
                              "SUPSP", "INFSP", "SUBSC", "TMIN",
-                             "TMAJ", "PECM1", "PECM2", "PECM3", "LAT", "CORB"),
+                             "TMAJ", "PECM1", "PECM2", "PECM3", "LAT", "CORB"
+                             "bic_l", "bic_b", "tric_long"),
                 "MTUgroups": {"g1": ("LVS", "SBCL"),
                               "g2": ("TRP1", "TRP2", "TRP3", "TRP4"),
                               "g3": ("RMN", "RMJ1", "RMJ2"),
@@ -134,8 +136,9 @@ def load_model(model_name):
                               "g6": ("SUPSP", "INFSP", "SUBSC", "TMIN"),
                               "g7": ("PECM1", "PECM2", "PECM3"),
                               "g8": ("PMN", "LAT", "TMAJ"),
-                              "g9": "CORB"}
-                }  # ADD BICEPS and TRICEPS
+                              "g9": "CORB",
+                              "g10": ("bic_l", "bic_b", "tric_long")}
+                }
     elif model_name.lower() == "das3":
         return {"ModelName": "DAS3",
                 "DoFName": ("SC_x", "SC_y", "SC_z", "AC_x", "AC_y", "AC_z", "GH_x", "GH_y", "GH_z"),
@@ -168,8 +171,7 @@ def load_model(model_name):
                      "pect_min_1", "pect_min_2", "pect_min_3", "pect_min_4",
                      "brachialis_1", "brachialis_2", "brachialis_3", "brachialis_4", "brachialis_5", "brachialis_6",
                      "brachialis_7", "brachiorad_1", "brachiorad_2",
-                     "coracobr_1", "coracobr_2",
-                     "coracobr_3")
+                     "coracobr_1", "coracobr_2", "coracobr_3")
                 }
     else:
         raise NotImplementedError("Wrong model_name")
@@ -178,8 +180,8 @@ def load_model(model_name):
 def write_model(setup_calib, calibrated_model_path):
     osim_model_old = setup_calib.uncalibrated_model.osim_path
     osim_model_new = osim_model_old[:-5] + '_optCEINMS.osim'
-
+    #xmlschema_doc = etree.parse("./XSD/subject.xsd")  #  validation with xsd
     calib_filename = calibrated_model_path
-    calib_tree = etree.parse(calib_filename).getroot() # print etree.tostring(tree.getroot(), pretty_print=True)
+    calib_tree = etree.parse(calib_filename).getroot()  # print etree.tostring(tree.getroot(), pretty_print=True)
 
     setup_calib.uncalibrated_model.write_model(osim_model_old, osim_model_new, calib_tree)

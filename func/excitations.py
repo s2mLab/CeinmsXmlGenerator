@@ -46,7 +46,7 @@ class Wu_v3:
             "mapping": {
                 'TRP1': (1, "Trap_sup"),
                 'TRP2': (1, "Trap_sup"),
-                'TRP3': (0.5, "Trap_inf", 0.5, "Trap_sup"),  # verifier avec Benjamin si ça marche
+                'TRP3': (0.5, "Trap_inf", 0.5, "Trap_sup"),  # TODO corriger avec Benjamin si ça marche
                 'TRP4': (1, "Trap_inf"),
                 'SRA2': (1, "Gd_dent"),
                 'SRA3': (1, "Gd_dent"),
@@ -61,5 +61,8 @@ class Wu_v3:
                 'PECM2': (1, "Pec"),
                 'PECM3': (1, "Pec"),
                 'LAT': (1, "Gd_dors"),
+                'bic_l':(1, "Biceps"),
+                'bic_b': (1, "Biceps"),
+                'tric_long': (1, "Triceps"),
             }
         }

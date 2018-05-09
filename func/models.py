@@ -88,9 +88,10 @@ class OsimModel:
         current_state = osim_model.initSystem()
         muscles = osim_model.getMuscles()
         muscle_list = []
-
+        print("******** FOR DOF: %s *********" % (dof_name))
         for muscle in muscles:
             # if muscle.isDisabled() == True:  # NOTE For some reason, isDisabled doesn't work
+            print("Test muscle: " + muscle.getName())
             muscle_crossed_joint_set = Wu.get_joints_spanned_by_muscle(osim_model, muscle)
 
             for curr_joint in muscle_crossed_joint_set:
@@ -123,6 +124,7 @@ class OsimModel:
 
                     if dof_name == curr_coord_name:
                         muscle_list.append(muscle.getName())
+                        print("** muscle included: " + muscle.getName())
         return muscle_list
 
     @staticmethod
@@ -143,7 +145,7 @@ class OsimModel:
             raise ValueError("No muscles found")
 
         # Remove duplicates and sorts
-        all_muscles = sorted(list(set(muscles)))
+        all_muscles = sorted(list(set(all_muscles)))
 
         mtu_set = Wu.extract_mtu_from_osim(osim_model, all_muscles)
         dof_set = Wu.extract_dof_set_from_osim(dof_list, dof_to_muscles)

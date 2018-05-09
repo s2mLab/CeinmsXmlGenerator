@@ -6,25 +6,24 @@ base_path, ceinms_path = utils.determine__base_paths()
 
 
 # # # DEFINE DoF, MODELS and SUBJECT, vCalibTrials, Trials # # #
-uncalib_model_path = base_path + "DapO/models/1_scaled_and_markersMICK.osim"
-model_name = 'Wu'  # "Wu"| 'DAS3'
 subject = 'DapO'
-dof = 'G'  # 'G' | 'SAG"
-#dof_list = ("shoulder_ele", "shoulder_plane", "shoulder_rotation")
+uncalib_model_path = base_path + "%s/models/1_generic_MICK_Wu_v5_test2.osim" % (subject)
+model_name = 'Wu'  # "Wu"| 'DAS3'
+joints = 'SAG'  # 'G' | 'SAG"
 v_calib_trials = 1
 v_tendon = 'stiff' #'stiff' | 'equilibriumElastic'
 trials = 'All'  # | 'All' | 'AllButCalib' | 'Calib'
-force_recalib = False
+force_recalib = True
 
 model_type = models.Wu
 excitations_type = excitations.Wu_v3
-calibrations_type = calibrations.Wu_GH_v1
+calibrations_type = calibrations.Wu_SAG_v1 # Wu_GH_v1 Wu_SAG_v1
 execution_type = []  # TODO with Benjamin execution.EMGdriven # EMGdriven | Hydrib | Static_optim
 # # # END OF THE MAIN VARIABLES # # #
 
 # Setup the trials
 model, setup_calib, setup_trials = utils.build_and_setup_model(base_path, subject, model_name, uncalib_model_path,
-                                                               dof, trials, v_calib_trials, v_tendon,
+                                                               joints, trials, v_calib_trials, v_tendon,
                                                                model_type, excitations_type, calibrations_type, execution_type,
                                                                force_recalib)
 
