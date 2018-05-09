@@ -16,17 +16,19 @@ import os
 
 
 
-def compare_emg(trial_path, dir_result, excitations_type):
+def compare_emg(dir_trial, dir_result, excitations_type, name, units):
 
     emgCEINMS = read_STO(dir_result, 'AdjustedEmgs')
-    emg = read_STO(trial_path, 'EMG')
+    emg = read_STO(dir_trial, 'EMG')
     mapping = excitations_type.excitation()['mapping']
 
     nMTU = emgCEINMS.getColumnLabels().__len__()
     nrows = np.floor(sqrt(nMTU))
     ncols = np.ceil(nMTU/nrows)
 
-    _, ax = plt.subplots(int(nrows), int(ncols), sharex=True)
+    fig, ax = plt.subplots(int(nrows), int(ncols), sharex=True)
+    manager = plt.get_current_fig_manager()
+    manager.window.showMaximized()
 
     count = 0
     row = 0
@@ -62,9 +64,9 @@ def compare_emg(trial_path, dir_result, excitations_type):
             ax[row, col].set_title(MTU + '_rms(%f)' % (rmsEMG[count]))
 
             if col == 0:
-                ax[row, col].plt.ylabel('Excitation [%]')
-            if row == nrows:
-                ax[row, col].plt.xlabel('time [samples]')
+                ax[row, col].set_ylabel('%s [%s]' % (name, units))
+            if row == nrows - 1:
+                ax[row, col].set_xlabel('time [s]')
 
             count = count+1
             col = col + 1
@@ -75,7 +77,7 @@ def compare_emg(trial_path, dir_result, excitations_type):
         else:
             print('no EMG')
 
-        return rmsEMG
+    return rmsEMG, fig
 
 
 def compare_msk(trial_path, dir_result, excitations_type):
@@ -87,15 +89,60 @@ def compare_msk(trial_path, dir_result, excitations_type):
     rmsTorque,figTorque = compare_xy(dir_result, 'Torques', dir_trial, 'InvDyn', 'Torques','Nm','_moment')
     rmsActivation, figActivation = compare_xy(dir_result, 'Activations', dir_trial, 'StaticOptimization_activation', 'Activation','0-1')
     rmsForce, figForce = compare_xy(dir_result, 'MuscleForces', dir_trial, 'StaticOptimization_force', 'Muscle Forces','N')
-    # rmsJRF, figJRF = [] #compare_xy(dir_result, '', dir_trial, '', 'GH force','N')
+    #rmsJRF, figJRF = compare_xy(dir_result, '', dir_trial, '_JointReaction_ReactionLoads', 'GH force','N') # warning : only the first 3 columns
+    rmsEMG, figEMG = compare_emg(dir_trial, dir_result, excitations_type, 'excitation', '0-1')
 
+    figGH = compare_gh_forces(trial_path, dir_result)
+
+    pp.savefig(figEMG)
     pp.savefig(figTorque)
     pp.savefig(figActivation)
     pp.savefig(figForce)
+    pp.savefig(figGH)
+
     pp.close()
 
     return rmsTorque, rmsActivation, rmsForce, #rmsJRF
 
+
+
+def compare_gh_forces(trial_path, dir_result):
+    dir_trial = trial_path[:-4] + os.sep
+
+    GHosim = read_STO(dir_trial, '_JointReaction_ReactionLoads')
+    Fx = osim2np(GHosim.getDependentColumnAtIndex(0))
+    Fy = osim2np(GHosim.getDependentColumnAtIndex(1))
+    Fz = osim2np(GHosim.getDependentColumnAtIndex(2))
+    F = np.vstack( (Fx, Fy, Fz) )
+    # var = GHosim.getColumnLabels()
+    # mx, my, mz, x, y, z for index 3 to 8
+
+    # calculate norm of GH force
+    normF = np.linalg.norm(F, axis=0)
+    unitF = F / normF # TODO: check may be wrong
+
+    # TODO: validate in opensim the directions of the forces ... 0 deg being forward
+
+    # Lippitt, S., & Matsen, F. (1993). Mechanisms of glenohumeral joint stability. Clinical orthopaedics and related research, (291), 20-28.
+    angles = np.arange(0, 2.1*np.pi, np.pi / 4)
+    coefMEAN = np.array([17, 19, 29, 20, 17, 25, 32, 23, 17]) / 50
+    coefSD = np.array([6, 6, 7, 8, 6, 9, 4, 4, 6]) / 50
+    xp = np.cos(angles) * (coefMEAN + coefSD)
+    yp = np.sin(angles) * (coefMEAN + coefSD)
+    xm = np.cos(angles) * (coefMEAN - coefSD)
+    ym = np.sin(angles) * (coefMEAN - coefSD)
+
+    fig, ax = plt.subplots(1,2, sharex=True)
+    manager = plt.get_current_fig_manager()
+    manager.window.showMaximized()
+
+    for i in [0, 1]:
+        ax[i].plot(xp,yp,'k-', xm, ym,'k--')
+        ax[i].axis('equal')
+
+    ax[0].plot(unitF[0, :], unitF[1, :], '.')
+
+    return fig
 
 
 def compare_xy(dir1name, param1name, dir2name, param2name, name, units, suffix=''):

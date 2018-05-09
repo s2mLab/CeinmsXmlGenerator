@@ -22,15 +22,15 @@ def determine__base_paths():
 
 
 def build_and_setup_model(base_path, subject, model_name, uncalib_model_path,
-                          dof, trials, v_calib_trials, v_tendon,
+                          joints, trials, v_calib_trials, v_tendon,
                           model_type, excitations_type, calibrations_type, execution_type, force_recalib):
     excitation = excitations_type()
     model, subject_path, dof_name, calib_trials, trials = prepare_model_and_trials(subject, base_path,
-                                                                                   model_name, dof,
+                                                                                   model_name, joints,
                                                                                    v_calib_trials, trials)
     uncalib_model = model_type(uncalib_model_path, dof_name)
     calib = calibrations_type(calib_trials, dof_name, v_tendon, model)
-    setup_calib, setup_trials = prepare_setup(uncalib_model, dof_name, trials, excitation, execution_type,
+    setup_calib, setup_trials = prepare_setup(model_name, joints, uncalib_model, dof_name, trials, excitation, execution_type,
                                               calib, v_tendon, force_recalib)
 
     return model, setup_calib, setup_trials
@@ -94,7 +94,7 @@ def prepare_model_and_trials(subject, base_path, model_name, joints, v_calib_tri
     return model, subject_path, dof_name, calib_trials, _trials
 
 
-def prepare_setup(uncalibrated_model, dof_name, trials, excitations, execution_type, calibration, v_tendon, force_recalib):
+def prepare_setup(model_name, joints, uncalibrated_model, dof_name, trials, excitations, execution_type, calibration, v_tendon, force_recalib):
 
     # # # CALIB # # #
     setup_calib = CeinmWriter.SetupCalib()
@@ -105,7 +105,8 @@ def prepare_setup(uncalibrated_model, dof_name, trials, excitations, execution_t
 
     # # # TRIALS # # #
     setup_trials = CeinmWriter.SetupTrial()
-    setup_trials.execution = execution.Hybrid(dof_name, v_tendon)  # EMG_driven Hybrid TODO choice from main
+    setup_trials.execution = eval('execution.%s_%s_%s(dof_name, v_tendon)' % (execution_type, model_name, joints))
+
     setup_trials.allow_override = True
     setup_trials.trials = trials
     ##################

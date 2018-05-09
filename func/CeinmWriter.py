@@ -1,5 +1,7 @@
 import os
 
+from sys import exit
+
 import lxml.etree as etree
 
 from func import xml_writer, utils
@@ -60,12 +62,11 @@ class Writer:
             self.write_excitation_generator_file(self.setup_calib.excitation)
             self.write_calibration_configuration_file(self.setup_calib.calibration)
 
-            if os.path.isfile(self.output_calib_path):
+            if os.path.isfile(self.calibrated_model_path):
                 os.remove(self.output_calib_path)
             os.system(self.ceinms_path + os.sep + "CEINMScalibrate -S " + self.calibration_path)
-            if not os.path.isfile(self.output_calib_path):
-                print("************* ERROR CEINMScalibration cannot calibrate the model *************")
-            # TODO check if the calibration has created the file ... else error
+            if not os.path.isfile(self.calibrated_model_path):
+                exit("************* ERROR CEINMScalibration cannot calibrate the model *************")
 
             # Write the calibrated model
             utils.write_model(self.setup_calib, self.calibrated_model_path)
