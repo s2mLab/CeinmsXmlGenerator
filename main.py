@@ -13,7 +13,7 @@ joints = 'SAG'  # 'G' | 'SAG"
 v_calib_trials = 1
 v_tendon = 'stiff' #'stiff' | 'equilibriumElastic'
 trials = 'All'  # | 'All' | 'AllButCalib' | 'Calib'
-force_recalib = True
+force_recalib = False
 
 model_type = models.Wu
 excitations_type = excitations.Wu_v3
