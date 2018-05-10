@@ -57,8 +57,8 @@ class Writer:
     def calibrate(self):
         if self.should_force_calibration:
             # Calibrate the model
-            self.write_model_file(self.setup_calib.uncalibrated_model.uncalibrated_model)
             self.write_calibration_file()
+            self.write_model_file(self.setup_calib.uncalibrated_model.uncalibrated_model)
             self.write_excitation_generator_file(self.setup_calib.excitation)
             self.write_calibration_configuration_file(self.setup_calib.calibration)
 
