@@ -46,7 +46,7 @@ class Wu_v3:
             "mapping": {
                 'TRP1': (1, "Trap_sup"),
                 'TRP2': (1, "Trap_sup"),
-                'TRP3': (0.5, "Trap_inf", 0.5, "Trap_sup"),  # TODO corriger avec Benjamin si ça marche
+                'TRP3': (0.5, "Trap_inf", 0.5, "Trap_sup"),
                 'TRP4': (1, "Trap_inf"),
                 'SRA2': (1, "Gd_dent"),
                 'SRA3': (1, "Gd_dent"),

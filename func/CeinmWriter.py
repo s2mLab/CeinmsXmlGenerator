@@ -141,9 +141,9 @@ class Writer:
         et_mapping = etree.SubElement(et_excitation_generator, 'mapping')
         for key, el in excitation.excitation()["mapping"].items():
             et_excitation = etree.SubElement(et_mapping, 'excitation', id=key)
-            # TODO METTRE ICI LE FAIT DE FAIRE PLUS D'UN MAPPING
-            et_input = etree.SubElement(et_excitation, 'input', weight=str(el[0]))
-            et_input.text = el[1]
+            for i in range(int(len(el)/2)):
+                et_input = etree.SubElement(et_excitation, 'input', weight=str(el[2*i]))
+                et_input.text = el[2*i+1]
 
         xml_writer.write_xml_file(self.excitation_generator_path, et_excitation_generator, pretty_print=True)
 

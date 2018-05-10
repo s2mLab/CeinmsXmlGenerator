@@ -82,15 +82,15 @@ def compare_emg(dir_trial, dir_result, excitations_type, name, units):
             npy_tnorm = f(time_emgCEINMS)
 
             rmsEMG[count] = sqrt(mean_squared_error(npx, npy_tnorm))
-            print('RMS error in %s: %f %%max Excitation' % (MTU, rmsEMG[count]))
+            print(f'RMS error in {MTU}: {rmsEMG[count]} %%max Excitation')
 
             ax[row, col].plot(time_emg, npy, 'k', label='mesured')
             ax[row, col].plot(time_emgCEINMS, npy_tnorm, 'k.', label='interp')
             ax[row, col].plot(time_emgCEINMS, npx, 'b', label='ceinms')
-            ax[row, col].set_title(MTU + '_rms(%f)' % (rmsEMG[count]))
+            ax[row, col].set_title(f'{MTU}_rms({rmsEMG[count]})')
 
             if col == 0:
-                ax[row, col].set_ylabel('%s [%s]' % (name, units))
+                ax[row, col].set_ylabel(f'{name} [{units}]')
             if row == nrows - 1:
                 ax[row, col].set_xlabel('time [s]')
 
@@ -199,14 +199,14 @@ def compare_xy(dir1name, param1name, dir2name, param2name, name, units, suffix='
         err = sqrt(mean_squared_error(x, y))
         rmsValue.append([i, err])
 
-        print('RMS error in %s: %f Nm' % (i, err))
+        print(f'RMS error in {i}: {err} Nm')
 
         ax[row, col].plot(time_y, y, 'k', label='osim')
         ax[row, col].plot(time_x, x, 'b', label='ceinms')
-        ax[row, col].set_title(i + '_rms(%f)' % (err))
+        ax[row, col].set_title(f'{i}_rms({err})')
 
         if col == 0:
-            ax[row, col].set_ylabel( '%s [%s]' % (name, units))
+            ax[row, col].set_ylabel(f'{name} [{units}]')
         if row == nrows-1:
             ax[row, col].set_xlabel('time [s]')
 
@@ -218,9 +218,9 @@ def compare_xy(dir1name, param1name, dir2name, param2name, name, units, suffix='
 
 
     ax[0, 0].legend()
-    #plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+    # plt.tight_layout(rect=[0, 0.03, 1, 0.95])
     plt.subplots_adjust(left=0.125, right=0.9, bottom=0.1, top=0.9, wspace=0.2, hspace=0.2)
-    #plt.show()
+    # plt.show()
     plt.savefig(dir1name + os.sep + name)
 
     return rmsValue, fig
