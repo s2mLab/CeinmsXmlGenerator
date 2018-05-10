@@ -63,7 +63,7 @@ class Writer:
             self.write_calibration_configuration_file(self.setup_calib.calibration)
 
             if os.path.isfile(self.calibrated_model_path):
-                os.remove(self.output_calib_path)
+                os.remove(self.calibrated_model_path)
             os.system(self.ceinms_path + os.sep + "CEINMScalibrate -S " + self.calibration_path)
             if not os.path.isfile(self.calibrated_model_path):
                 exit("************* ERROR CEINMScalibration cannot calibrate the model *************")
