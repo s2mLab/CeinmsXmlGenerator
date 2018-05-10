@@ -1,3 +1,12 @@
+def choose(model_name, joints, v_calib_trials):
+    if model_name.lower() == 'wu' and joints.lower() == 'g' and v_calib_trials == 1:
+        return Wu_G_v1
+    elif model_name.lower() == 'wu' and joints.lower() == 'sag' and v_calib_trials == 1:
+        return Wu_SAG_v1
+    else:
+        raise NotImplementedError("Model cannot be chosen")
+
+
 class Wu_G_v1:
     def __init__(self, calib_trials, dofs, vtendon, model):
         self.calib_trials = calib_trials

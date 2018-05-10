@@ -1,7 +1,27 @@
+
+def choose(model_name, joints, type):
+    if model_name.lower() == 'wu' and joints.lower() == 'g' and type.lower() == 'emg_driven':
+        return EMG_driven_Wu_G
+    elif model_name.lower() == 'wu' and joints.lower() == 'g' and type.lower() == 'hybrid':
+        return Hybrid_Wu_G
+    elif model_name.lower() == 'wu' and joints.lower() == 'g' and type.lower() == 'static_optim':
+        return Static_optim_Wu_G
+    elif model_name.lower() == 'wu' and joints.lower() == 'sag' and type.lower() == 'emg_driven':
+        return EMG_driven_Wu_SAG
+    elif model_name.lower() == 'wu' and joints.lower() == 'sag' and type.lower() == 'hybrid':
+        return Hybrid_Wu_SAG
+    elif model_name.lower() == 'wu' and joints.lower() == 'sag' and type.lower() == 'static_optim':
+        return Static_optim_Wu_SAG
+
+    else:
+        raise NotImplementedError("Model cannot be chosen")
+
+
 class Execution:
     def __init__(self, dofs, v_tendon): #TODO add list of muscles to check if all muscles are here in hybrid
         self.dofs = dofs
         self.v_tendon = v_tendon
+
 
 # ******************** EXECUTIONS FOR WU G ONLY ********************
 class EMG_driven_Wu_G(Execution):
@@ -106,9 +126,8 @@ class Static_optim_Wu_G(Execution):
             "elaboratedDoFs": self.dofs
         }
 
-
-
 # ******************** EXECUTIONS FOR WU SAG ********************
+
 
 class EMG_driven_Wu_SAG(Execution):
     def __init__(self, dofs, v_tendon):

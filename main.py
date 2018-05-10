@@ -8,24 +8,27 @@ base_path, ceinms_path = utils.determine__base_paths()
 # # # DEFINE DoF, MODELS and SUBJECT, vCalibTrials, Trials # # #
 subject = 'DapO'
 uncalib_model_path = f"{base_path}/{subject}/models/1_generic_MICK_Wu_v5_test2.osim"
+
 model_name = 'Wu'  # "Wu"| 'DAS3'
-joints = 'G'  # 'G' | 'SAG"
-v_calib_trials = 1
 v_tendon = 'stiff'  # 'stiff' | 'equilibriumElastic'
 trials = 'All'  # | 'All' | 'AllButCalib' | 'Calib'
 force_recalib = True
+v_calib_trials = 1
+joints = 'G'  # 'G' | 'SAG"
+excitation_version = 3
+exec_type = 'hybrid'
 
-excitations_type = eval(f'excitations.{model_name}_v{3}')# use v3
-calibrations_type = eval(f'calibrations.{model_name}_{joints}_v{1}') # used v1
-execution_type = 'Hybrid'  # TODO with Benjamin improve approach # EMGdriven | Hydrib | Static_optim
+model_type = models.choose(model_name)
+excitations_type = excitations.choose(model_name, excitation_version)
+calibrations_type = calibrations.choose(model_name, joints, v_calib_trials)
+execution_type = execution.choose(model_name, joints, exec_type)  # TODO with Benjamin improve approach # EMGdriven | Hydrib | Static_optim
 
 # # # END OF THE MAIN VARIABLES # # #
-model_type = eval(f'models.{model_name}')
 # Setup the trials
 model, setup_calib, setup_trials = utils.build_and_setup_model(base_path, subject, model_name, uncalib_model_path,
                                                                joints, trials, v_calib_trials, v_tendon,
-                                                               model_type, excitations_type, calibrations_type, execution_type,
-                                                               force_recalib)
+                                                               model_type, excitations_type, calibrations_type,
+                                                               execution_type, force_recalib)
 
 # Write configuration and calibration files
 cw = Writer(base_path, setup_calib, ceinms_path)

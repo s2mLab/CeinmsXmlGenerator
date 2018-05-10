@@ -4,6 +4,13 @@ import math
 from func.xml_writer import remove_begin, remove_end
 
 
+def choose(model_name):
+    if model_name.lower() == 'wu':
+        return Wu
+    else:
+        raise NotImplementedError("Model cannot be chosen")
+
+
 class OsimModel:
     def __init__(self, model_path, dof_list):
         self.osim_path = model_path
@@ -88,7 +95,7 @@ class OsimModel:
         current_state = osim_model.initSystem()
         muscles = osim_model.getMuscles()
         muscle_list = []
-        print("******** FOR DOF: %s *********" % (dof_name))
+        print(f"******** FOR DOF: {dof_name} *********")
         for muscle in muscles:
             # if muscle.isDisabled() == True:  # NOTE For some reason, isDisabled doesn't work
             print("Test muscle: " + muscle.getName())

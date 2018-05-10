@@ -1,4 +1,13 @@
 
+def choose(model_name, version):
+    if model_name.lower() == 'wu' and version == 1:
+        return Wu_v1
+    elif model_name.lower() == 'wu' and version == 3:
+        return Wu_v3
+    else:
+        raise NotImplementedError("Model cannot be chosen")
+
+
 class Wu_v1:
     @staticmethod
     def name():
