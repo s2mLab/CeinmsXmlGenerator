@@ -14,7 +14,8 @@ def determine__base_paths():
         base_path = "/home/pariterre/Dropbox/test_1/"
         ceinms_path = "~/Documents/Laboratoire/Programmation/CEINMS/ceinms/release/bin"
     elif os.uname()[1] == 'mickael-XPS-15-9560':
-        base_path = "/home/mickael/Documents/projetCEINMS/test_1/"
+        base_path = "/home/mickael/Documents/Dropbox/pyosim_irsst/"
+        #base_path = "/home/mickael/Documents/projetCEINMS/test_1/"
         ceinms_path = "/home/mickael/miniconda3/envs/CEINMS/bin/"
     else:
         raise NotImplementedError("Please add your computer to determine_path.py script")
@@ -37,7 +38,7 @@ def build_and_setup_model(base_path, subject, model_name, uncalib_model_path,
 
 
 def prepare_model_and_trials(subject, base_path, model_name, joints, v_calib_trials, trials):
-    subject_path = "./" + subject + "/Trials/"
+    subject_path = "./" + subject + "/1_inverse_kinematic/"
     model = load_model(model_name)
 
     if model["ModelName"].lower() == 'wu' or model["ModelName"].lower() == 'das3':
@@ -52,37 +53,48 @@ def prepare_model_and_trials(subject, base_path, model_name, joints, v_calib_tri
 
     print("********* DoF for CEINMS are: %s ************" % str(dof_name))
 
+    xml_dir = os.path.join(base_path, subject_path, '../0_ceinms_xml/')
+    if not os.path.isdir(xml_dir):
+        os.mkdir(xml_dir)
+
     # # # CHOOSE CalibTrials and Trials # # #
     # xHy_z   with x=6|12|18 y=1-6  z=1-3
     if v_calib_trials == 1:
-        calib_trials = []  # initialiser avec un mouvement fonctionnel
+        calib_trials = []  # initialiser avec un mouvement fonctionnel pour faible emg.
         x = [6, 12, 18]  # kg
-        y = 1  # changer pour excentric yeux -> hanches qd tout généré par Romain
+        y = 2  # changer pour excentric yeux -> hanches qd tout généré par Romain
         z = 1  # x= all,
         for i in x:
-            calib_trials += glob.glob(os.path.join(base_path, subject_path) + "/" + model_name.lower() + "*" + str(i) +
-                                      "*" + str(y) + "_" + str(z) + ".xml")
+            calib_trials += glob.glob(xml_dir + "/" + model_name.lower() +
+                                        "*" + str(i) + "*" + str(y) + "_" + str(z) + ".xml")
+
     else:
         raise ValueError("Wrong value for v_calib_trials")
 
-    # regarder tous les dossiers et générer les xml
-    for subdir in next(os.walk(os.path.join(base_path, subject_path)))[1]:
-        fname = os.path.join(base_path, subject_path, subdir + '.xml')
-        if subdir.startswith(model["ModelName"].lower()) and not os.path.isfile(fname):
-            print("Generate xml for trial: " + subdir)
-            Writer.generate_trial_xml(model, os.path.join(base_path, subject_path, subdir), fname)
+    # regarder tous les fichier mot et générer les xml
+    cwd = os.getcwd()
+    os.chdir(os.path.join(base_path, subject_path))
+
+
+    for file in glob.glob("*.mot"):# next(os.walk(os.path.join(base_path, subject_path)))[1]:
+        fname = file[:-4]
+        if fname.startswith(model["ModelName"].lower()) and not os.path.isfile(xml_dir + fname + '.xml'):
+            print("Generate xml for trial: " + fname)
+            Writer.generate_trial_xml(model, xml_dir, fname)
 
     # # # GENERATE trials.xml # # #
     if trials.lower() == 'all':
-        _trials = glob.glob(os.path.join(base_path, subject_path) + "/" + model_name.lower() + "*.xml")
+        _trials = glob.glob(xml_dir + "/" + model_name.lower() + "*.xml")
     elif trials.lower() == 'allbutcalib':
-        _trials = glob.glob(os.path.join(base_path, subject_path) + "/" + model_name.lower() + "*.xml")
+        _trials = glob.glob(xml_dir + "/" + model_name.lower() + "*.xml")
         for i in calib_trials:
             _trials.remove(i)
     elif trials.lower() == 'calib':
         _trials = calib_trials
     else:
         raise ValueError("wrong value for trials")
+
+    os.chdir(cwd)
 
     calib_trials = tuple(calib_trials)
     print('********* Calibration Files **********')

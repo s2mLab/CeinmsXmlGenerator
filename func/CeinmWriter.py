@@ -185,17 +185,17 @@ class Writer:
 
         # ToDo modify the names according to Romain ... perhaps store names in utils to be used later?
 
-        file_name = directory + "/_MuscleAnalysis_Length.sto"
+        file_name = directory + "../4_muscle_analysis/" + fname + "_MuscleAnalysis_Length.sto"
         if not os.path.isfile(file_name):
             print("File " + file_name + " does not exist")
         etree.SubElement(et_trial, "muscleTendonLengthFile").text = file_name
 
-        file_name = directory + "/EMG.sto"
+        file_name = directory + "../0_emg/" + fname[fname.find('_')+1:] + ".sto"
         if not os.path.isfile(file_name):
             print("File " + file_name + " does not exist")
         etree.SubElement(et_trial, "excitationsFile").text = file_name
 
-        file_name = directory + "/InvDyn.sto"
+        file_name = directory + "../2_inverse_dynamic/" + fname + ".sto"
         if not os.path.isfile(file_name):
             print("File " + file_name + " does not exist")
         etree.SubElement(et_trial, "externalTorquesFile").text = file_name
@@ -205,12 +205,12 @@ class Writer:
         for dof in dof_name:
             tp = etree.SubElement(branch, "momentArmsFile")
             tp.set("dofName", dof)
-            file_name = directory + "/_MuscleAnalysis_MomentArm_" + dof + ".sto"
+            file_name = directory + "../4_muscle_analysis/" + fname + "_MuscleAnalysis_MomentArm_" + dof + ".sto"
             if not os.path.isfile(file_name):
                 print("File " + file_name + " does not exist")
             tp.text = file_name
 
-        xml_writer.write_xml_file(fname, et_trial, pretty_print=True)
+        xml_writer.write_xml_file(directory + fname+'.xml', et_trial, pretty_print=True)
 
     @staticmethod
     def _get_values(values):
