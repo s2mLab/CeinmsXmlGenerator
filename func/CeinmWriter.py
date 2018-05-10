@@ -141,6 +141,7 @@ class Writer:
         et_mapping = etree.SubElement(et_excitation_generator, 'mapping')
         for key, el in excitation.excitation()["mapping"].items():
             et_excitation = etree.SubElement(et_mapping, 'excitation', id=key)
+            # TODO METTRE ICI LE FAIT DE FAIRE PLUS D'UN MAPPING
             et_input = etree.SubElement(et_excitation, 'input', weight=str(el[0]))
             et_input.text = el[1]
 

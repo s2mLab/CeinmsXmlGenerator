@@ -61,7 +61,7 @@ class Wu_v3:
                 'PECM2': (1, "Pec"),
                 'PECM3': (1, "Pec"),
                 'LAT': (1, "Gd_dors"),
-                'bic_l':(1, "Biceps"),
+                'bic_l': (1, "Biceps"),
                 'bic_b': (1, "Biceps"),
                 'tric_long': (1, "Triceps"),
             }

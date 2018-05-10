@@ -13,7 +13,7 @@ joints = 'G'  # 'G' | 'SAG"
 v_calib_trials = 1
 v_tendon = 'stiff' #'stiff' | 'equilibriumElastic'
 trials = 'All'  # | 'All' | 'AllButCalib' | 'Calib'
-force_recalib = False
+force_recalib = True
 
 excitations_type = eval('excitations.%s_v%d' % (model_name, 3) )# use v3
 calibrations_type = eval('calibrations.%s_%s_v%d' % (model_name, joints, 1) ) # used v1
