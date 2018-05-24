@@ -7,7 +7,8 @@ base_path, ceinms_path = utils.determine__base_paths()
 
 # # # DEFINE DoF, MODELS and SUBJECT, vCalibTrials, Trials # # #
 subject = 'DapO'
-uncalib_model_path = f"{base_path}/{subject}/models/1_generic_MICK_Wu_v5_test2.osim"
+uncalib_model_path = f"{base_path}/{subject}/models/wu.osim"
+model_to_add = f"{base_path}/{subject}/models/box.osim"
 
 model_name = 'Wu'  # "Wu"| 'DAS3'
 v_tendon = 'stiff'  # 'stiff' | 'equilibriumElastic'
@@ -35,6 +36,9 @@ cw = Writer(base_path, setup_calib, ceinms_path)
 
 # Run calibration process if needed
 cw.calibrate()
+
+# Add the box to the model
+models.OsimModel.combine_models(cw.calibrated_model_path, model_to_add)
 
 # Run
 cw.run(setup_trials, excitations_type)

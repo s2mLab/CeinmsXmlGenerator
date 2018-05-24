@@ -184,6 +184,23 @@ class OsimModel:
             to_sort_sorted[key] = to_sort[key]
         return to_sort_sorted
 
+    @staticmethod
+    def combine_models(base_model, model_to_add):
+        # Open the models
+        osim_base = opensim.Model(base_model)
+        osim_to_add = opensim.Model(model_to_add)
+
+        bodies = osim_to_add.get_BodySet()
+        joints = osim_to_add.getJointSet()
+        for body in bodies:
+            osim_base.addBody(body)
+
+        for joint in joints:
+            osim_base.addJoint(joint)
+        osim_base.initSystem()
+
+        osim_base.printToXML(base_model)
+
 
 class Wu(OsimModel):
     def __init__(self, model_path, dof_list):
