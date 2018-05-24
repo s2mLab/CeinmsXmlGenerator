@@ -190,15 +190,27 @@ class OsimModel:
         osim_base = opensim.Model(base_model)
         osim_to_add = opensim.Model(model_to_add)
 
-        bodies = osim_to_add.get_BodySet()
+        bodies = osim_to_add.getBodySet()
         joints = osim_to_add.getJointSet()
+        controls = osim_to_add.getControllerSet()
+        constraints = osim_to_add.getConstraintSet()
+        markers = osim_to_add.getMarkerSet()
         for body in bodies:
             osim_base.addBody(body)
 
         for joint in joints:
             osim_base.addJoint(joint)
-        osim_base.initSystem()
 
+        for control in controls:
+            osim_base.addControl(control)
+
+        for constraint in constraints:
+            osim_base.addConstraint(constraint)
+
+        for marker in markers:
+            osim_base.addMarker(marker)
+
+        osim_base.initSystem()
         osim_base.printToXML(base_model)
 
 
